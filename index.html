@@ -34,7 +34,7 @@
 </div>
 
 <script>
-const googleScriptURL = "https://script.google.com/macros/s/AKfycbxYyF8UcBigcXJ-daMJrCLVdJVm5eY-qAUYQ545JWnNl7coZh9hb7MkofcFehAXLdw2rw/exec"; 
+const googleScriptURL = "https://script.google.com/macros/s/AKfycbwtCtnjbqfNL3_I5p5_F4XSHhos1yxH4_WJbQrfWfhWum3D1FiUYjhtNh4jPhGmBa9pgA/exec"; 
 const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; 
 
 let visitLog = {
@@ -47,22 +47,14 @@ let visitLog = {
 };
 
 
-fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ip,
-            country: countryNameCN,
-            code: countryCode,
-            time: timestamp,
-            device,
-            language,
-            status: accessStatus
-          }),
-        });
+function logToGoogleSheet(status) {
+  visitLog.status = status;
+  fetch(googleScriptURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(visitLog)
+  }).catch(e => console.error("Fehler beim Senden der Daten:", e));
+}
 
 
 async function checkCountry() {
