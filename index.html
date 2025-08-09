@@ -37,24 +37,23 @@
 const googleScriptURL = "https://script.google.com/macros/s/AKfycbwtCtnjbqfNL3_I5p5_F4XSHhos1yxH4_WJbQrfWfhWum3D1FiUYjhtNh4jPhGmBa9pgA/exec"; 
 const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; 
 
-let visitLog = {
-    ip: "",
-    country: "",
+document.getElementById("testBtn").onclick = () => {
+  const visitLog = {
+    ip: "1.2.3.4",
+    country: "DE","AT",
     device: navigator.userAgent,
     language: navigator.language,
-    time: new Date().toLocaleString(),
-    status: ""
-};
+    status: "TestClick"
+  };
 
-
-function logToGoogleSheet(status) {
-  visitLog.status = status;
   fetch(googleScriptURL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(visitLog)
-  }).catch(e => console.error("Fehler beim Senden der Daten:", e));
-}
+  }).then(res => res.text())
+    .then(text => alert("服务器响应: " + text))
+    .catch(err => alert("请求失败: " + err));
+};
 
 
 async function checkCountry() {
