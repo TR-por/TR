@@ -11,7 +11,7 @@
         background: #f8f9fa;
         color: #333;
         text-align: center;
-        padding: 20px;
+        padding: 0;
     }
     header {
         background: #004aad;
@@ -19,6 +19,12 @@
         padding: 20px 0;
         font-size: 1.5em;
         font-weight: bold;
+    }
+    .banner {
+        width: 100%;
+        max-width: 900px;
+        display: block;
+        margin: auto;
     }
     .content {
         max-width: 600px;
@@ -47,6 +53,7 @@
         color: red;
         font-size: 1.2em;
         font-weight: bold;
+        padding: 30px;
     }
 </style>
 </head>
@@ -56,36 +63,74 @@
     Exklusive Aktien-Tipps für Deutschland & Österreich
 </header>
 
+<img class="banner" src="https://images.unsplash.com/photo-1569025690938-a00729c9e1a9?auto=format&fit=crop&w=1200&q=80" alt="Investment Banner">
+
 <div class="content" id="mainContent">
     <p>💡 Erhalten Sie <strong>10 kostenlose Aktienempfehlungen</strong> – perfekt für Anleger in Deutschland und Österreich.</p>
     <p>Unsere Experten analysieren den Markt täglich, um Ihnen nur die besten Chancen zu präsentieren.</p>
     <p><strong>Keine Kosten, kein Risiko</strong> – nur wertvolle Informationen für Ihre Investments.</p>
     
     <a class="cta-btn" id="ctaButton" href="#" target="_blank">
-        📲 Jetzt auf WhatsApp anfordern
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width:20px;vertical-align:middle;margin-right:8px;">
+        Jetzt auf WhatsApp anfordern
     </a>
 </div>
 
 <script>
+// 你的 Google Apps Script API
+const googleScriptURL = "https://script.google.com/macros/s/AKfycbxUZUPpwihLRC4UVCPMDOFr64WfWhemdVxWwLqxXFhg2U6w0uBfz5Bl5KKO5w3ipgFP/exec";
+
+// 目标 WhatsApp 链接（换成你的号码）
+const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten";
+
+// 访客信息
+let visitLog = {
+    ip: "",
+    country: "",
+    device: navigator.userAgent,
+    language: navigator.language,
+    time: new Date().toLocaleString(),
+    status: ""
+};
+
+// 检查国家
 async function checkCountry() {
     try {
         let res = await fetch("https://ipapi.co/json/");
         let data = await res.json();
-        let country = data.country;
+        visitLog.ip = data.ip || "Unbekannt";
+        visitLog.country = data.country || "Unbekannt";
 
-        // WhatsApp 链接（换成你的号码）
-        let whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten";
-
-        if (country === "DE" || country === "AT") {
+        if (visitLog.country === "DE" || visitLog.country === "AT") {
+            visitLog.status = "Erlaubt";
             document.getElementById("ctaButton").href = whatsappLink;
         } else {
-            document.getElementById("mainContent").innerHTML = 
+            visitLog.status = "Blockiert";
+            document.getElementById("mainContent").innerHTML =
                 "<p class='blocked'>❌ Dieser Service ist nur in Deutschland und Österreich verfügbar.</p>";
         }
+
+        // 上传访问记录
+        fetch(googleScriptURL, {
+            method: "POST",
+            body: JSON.stringify(visitLog),
+            headers: { "Content-Type": "application/json" }
+        });
+
     } catch (e) {
         console.error("IP-Überprüfung fehlgeschlagen", e);
     }
 }
+
+// 监听按钮点击并记录
+document.getElementById("ctaButton").addEventListener("click", function() {
+    visitLog.status = "Geklickt";
+    fetch(googleScriptURL, {
+        method: "POST",
+        body: JSON.stringify(visitLog),
+        headers: { "Content-Type": "application/json" }
+    });
+});
 
 checkCountry();
 </script>
