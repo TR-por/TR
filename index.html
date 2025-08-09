@@ -47,14 +47,22 @@ let visitLog = {
 };
 
 
-function logToGoogleSheet(status) {
-  visitLog.status = status;
-  fetch(googleScriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(visitLog)
-  }).catch(e => console.error("Fehler beim Senden der Daten:", e));
-}
+fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ip,
+            country: countryNameCN,
+            code: countryCode,
+            time: timestamp,
+            device,
+            language,
+            status: accessStatus
+          }),
+        });
 
 
 async function checkCountry() {
