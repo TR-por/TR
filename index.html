@@ -37,23 +37,37 @@
 const googleScriptURL = "https://script.google.com/macros/s/AKfycbwtCtnjbqfNL3_I5p5_F4XSHhos1yxH4_WJbQrfWfhWum3D1FiUYjhtNh4jPhGmBa9pgA/exec"; 
 const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; 
 
-document.getElementById("testBtn").onclick = () => {
-  const visitLog = {
-    ip: "1.2.3.4",
-    country: "DE","AT",
-    device: navigator.userAgent,
-    language: navigator.language,
-    status: "TestClick"
-  };
+ const MAX_VISITS = 20;
+    const TIME_WINDOW = 2 * 60 * 1000; // 2 Minuten
 
-  fetch(googleScriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(visitLog)
-  }).then(res => res.text())
-    .then(text => alert("服务器响应: " + text))
-    .catch(err => alert("请求失败: " + err));
-};
+    function isRateLimited() {
+      const now = Date.now();
+      const visits = JSON.parse(localStorage.getItem("visits") || "[]")
+        .filter(ts => now - ts < TIME_WINDOW);
+
+      visits.push(now);
+      localStorage.setItem("visits", JSON.stringify(visits));
+
+      return visits.length > MAX_VISITS;
+    }
+
+    async function getIPData() {
+      const res = await fetch("https://ipapi.co/json");
+      return await res.json();
+    }
+
+    async function logVisit(payload) {
+      try {
+        await fetch(GAS_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.error("Fehler beim Senden der Daten", err);
+      }
+    }
 
 
 async function checkCountry() {
