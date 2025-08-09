@@ -19,7 +19,7 @@
 
 <header>Exklusive Aktien-Tipps für Deutschland & Österreich</header>
 
-<!-- 换成你的图片链接 -->
+
 <img class="banner" src="https://github.com/TR-por/TR/blob/main/banner.jpg.png?raw=true" alt="Investment Banner">
 
 <div class="content" id="mainContent">
@@ -34,8 +34,8 @@
 </div>
 
 <script>
-const googleScriptURL = "https://script.google.com/macros/s/AKfycbxYyF8UcBigcXJ-daMJrCLVdJVm5eY-qAUYQ545JWnNl7coZh9hb7MkofcFehAXLdw2rw/exec"; // ← 换成你的
-const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; // ← 换成你的号码
+const googleScriptURL = "https://script.google.com/macros/s/AKfycbxYyF8UcBigcXJ-daMJrCLVdJVm5eY-qAUYQ545JWnNl7coZh9hb7MkofcFehAXLdw2rw/exec"; 
+const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; 
 
 let visitLog = {
     ip: "",
@@ -46,7 +46,7 @@ let visitLog = {
     status: ""
 };
 
-// 记录到 Google 表格
+
 function logToGoogleSheet(status) {
     visitLog.status = status;
     fetch(googleScriptURL, {
@@ -56,7 +56,7 @@ function logToGoogleSheet(status) {
     });
 }
 
-// 检查国家并记录
+
 async function checkCountry() {
     try {
         let res = await fetch("https://ipapi.co/json/");
@@ -77,7 +77,7 @@ async function checkCountry() {
     }
 }
 
-// 按钮点击记录
+
 document.getElementById("ctaButton").addEventListener("click", function() {
     logToGoogleSheet("Geklickt");
 });
