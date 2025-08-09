@@ -5,64 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ihre kostenlose Aktienempfehlung</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: #f8f9fa;
-        color: #333;
-        text-align: center;
-        padding: 0;
-    }
-    header {
-        background: #004aad;
-        color: white;
-        padding: 20px 0;
-        font-size: 1.5em;
-        font-weight: bold;
-    }
-    .banner {
-        width: 100%;
-        max-width: 900px;
-        display: block;
-        margin: auto;
-    }
-    .content {
-        max-width: 600px;
-        margin: auto;
-        padding: 20px;
-    }
-    .content p {
-        font-size: 1.2em;
-        line-height: 1.6;
-    }
-    .cta-btn {
-        display: inline-block;
-        background: #25d366;
-        color: white;
-        padding: 15px 25px;
-        margin-top: 20px;
-        text-decoration: none;
-        font-size: 1.3em;
-        border-radius: 8px;
-        transition: background 0.3s ease;
-    }
-    .cta-btn:hover {
-        background: #1ebe5d;
-    }
-    .blocked {
-        color: red;
-        font-size: 1.2em;
-        font-weight: bold;
-        padding: 30px;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f8f9fa; color: #333; text-align: center; }
+    header { background: #004aad; color: white; padding: 20px 0; font-size: 1.5em; font-weight: bold; }
+    .banner { width: 100%; max-width: 900px; display: block; margin: auto; }
+    .content { max-width: 600px; margin: auto; padding: 20px; }
+    .content p { font-size: 1.2em; line-height: 1.6; }
+    .cta-btn { display: inline-block; background: #25d366; color: white; padding: 15px 25px; margin-top: 20px; text-decoration: none; font-size: 1.3em; border-radius: 8px; transition: background 0.3s ease; }
+    .cta-btn:hover { background: #1ebe5d; }
+    .blocked { color: red; font-size: 1.2em; font-weight: bold; padding: 30px; }
 </style>
 </head>
 <body>
 
-<header>
-    Exklusive Aktien-Tipps für Deutschland & Österreich
-</header>
+<header>Exklusive Aktien-Tipps für Deutschland & Österreich</header>
 
+<!-- 换成你的图片链接 -->
 <img class="banner" src="https://images.unsplash.com/photo-1569025690938-a00729c9e1a9?auto=format&fit=crop&w=1200&q=80" alt="Investment Banner">
 
 <div class="content" id="mainContent">
@@ -77,13 +34,9 @@
 </div>
 
 <script>
-// 你的 Google Apps Script API
-const googleScriptURL = "https://script.google.com/macros/s/AKfycbxUZUPpwihLRC4UVCPMDOFr64WfWhemdVxWwLqxXFhg2U6w0uBfz5Bl5KKO5w3ipgFP/exec";
+const googleScriptURL = "https://script.google.com/macros/s/AKfycbzJ36KJCIlh0Wqo8eqI69N4UXuYq1NrqiLE2lbC7K5dJxjzcoEUSObqsMOa2_l6JqIm-A/exec"; // ← 换成你的
+const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten"; // ← 换成你的号码
 
-// 目标 WhatsApp 链接（换成你的号码）
-const whatsappLink = "https://api.whatsapp.com/send/?phone=491639447584&text=Ich+m%C3%B6chte+die+10+kostenlosen+Aktientipps+erhalten";
-
-// 访客信息
 let visitLog = {
     ip: "",
     country: "",
@@ -93,7 +46,17 @@ let visitLog = {
     status: ""
 };
 
-// 检查国家
+// 记录到 Google 表格
+function logToGoogleSheet(status) {
+    visitLog.status = status;
+    fetch(googleScriptURL, {
+        method: "POST",
+        body: JSON.stringify(visitLog),
+        headers: { "Content-Type": "application/json" }
+    });
+}
+
+// 检查国家并记录
 async function checkCountry() {
     try {
         let res = await fetch("https://ipapi.co/json/");
@@ -102,34 +65,21 @@ async function checkCountry() {
         visitLog.country = data.country || "Unbekannt";
 
         if (visitLog.country === "DE" || visitLog.country === "AT") {
-            visitLog.status = "Erlaubt";
             document.getElementById("ctaButton").href = whatsappLink;
+            logToGoogleSheet("Erlaubt");
         } else {
-            visitLog.status = "Blockiert";
             document.getElementById("mainContent").innerHTML =
                 "<p class='blocked'>❌ Dieser Service ist nur in Deutschland und Österreich verfügbar.</p>";
+            logToGoogleSheet("Blockiert");
         }
-
-        // 上传访问记录
-        fetch(googleScriptURL, {
-            method: "POST",
-            body: JSON.stringify(visitLog),
-            headers: { "Content-Type": "application/json" }
-        });
-
     } catch (e) {
         console.error("IP-Überprüfung fehlgeschlagen", e);
     }
 }
 
-// 监听按钮点击并记录
+// 按钮点击记录
 document.getElementById("ctaButton").addEventListener("click", function() {
-    visitLog.status = "Geklickt";
-    fetch(googleScriptURL, {
-        method: "POST",
-        body: JSON.stringify(visitLog),
-        headers: { "Content-Type": "application/json" }
-    });
+    logToGoogleSheet("Geklickt");
 });
 
 checkCountry();
